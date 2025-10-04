@@ -1,49 +1,82 @@
-// main.js — Leaflet + NASA GIBS (replaces previous OpenSeadragon approach)
-
+// main.js — Step 4 (stable Leaflet + NASA GIBS layer control, no wrap)
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🚀 Initializing Embiggen Viewer (Leaflet + NASA GIBS)...");
+  console.log(
+    "🚀 Initializing Embiggen Viewer (Leaflet + NASA GIBS Layers)..."
+  );
 
-  // Create the map
+  // Create the Leaflet map in the 'map' div
   const map = L.map("map", {
     center: [0, 0],
     zoom: 2,
-    minZoom: 0,
+    minZoom: 1,
     maxZoom: 9,
-    worldCopyJump: true,
+    worldCopyJump: false,
+    // continuousWorld false + noWrap on layers prevents duplication
   });
 
-  // NASA GIBS MODIS Terra True Color (EPSG:3857 - GoogleMapsCompatible tiles)
-  const gibsUrl =
-    "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/" +
-    "MODIS_Terra_CorrectedReflectance_TrueColor/default/2025-09-01/" +
-    "GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg";
+  // Template: GoogleMapsCompatible (EPSG:3857) — works well with Leaflet
+  function gibsTileUrl(layerName) {
+    return `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${layerName}/default/2025-09-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`;
+  }
 
-  const gibsLayer = L.tileLayer(gibsUrl, {
-    attribution: "&copy; NASA GIBS",
-    maxZoom: 9,
-    tileSize: 256,
-    crossOrigin: true,
-    keepBuffer: 2,
-  });
+  // True Color (MODIS Terra)
+  const trueColor = L.tileLayer(
+    gibsTileUrl("MODIS_Terra_CorrectedReflectance_TrueColor"),
+    {
+      attribution: "&copy; NASA GIBS",
+      maxZoom: 9,
+      tileSize: 256,
+      noWrap: true, // prevents horizontal tiling duplication
+      continuousWorld: false,
+      crossOrigin: true,
+    }
+  );
 
-  gibsLayer.addTo(map);
+  // Infrared (example band combination)
+  const infrared = L.tileLayer(
+    gibsTileUrl("MODIS_Terra_CorrectedReflectance_Bands367"),
+    {
+      attribution: "&copy; NASA GIBS",
+      maxZoom: 9,
+      tileSize: 256,
+      noWrap: true,
+      continuousWorld: false,
+      crossOrigin: true,
+    }
+  );
 
-  // Basic UI controls
+  // Add default (true color)
+  trueColor.addTo(map);
+
+  // Add layer control
+  const baseMaps = {
+    "True Color (MODIS Terra)": trueColor,
+    "Infrared (Bands 367)": infrared,
+  };
+  L.control.layers(baseMaps, null, { collapsed: false }).addTo(map);
+
+  // Add scale
   L.control.scale().addTo(map);
 
-  // Logging tile load errors
-  gibsLayer.on("tileerror", function (e) {
-    console.error("Tile error loading:", e);
+  // Log tile loads and errors for debug/testing
+  trueColor.on("tileload", (e) => {
+    console.log("✅ TrueColor tile loaded (sample).");
+    // remove handler after first tile to avoid spamming console
+    trueColor.off("tileload");
+  });
+  trueColor.on("tileerror", (e) => {
+    console.error("Tile error (TrueColor):", e);
   });
 
-  // Confirm loaded by checking when one tile loads
-  gibsLayer.on("tileload", function (e) {
-    // Show success once (remove handler afterwards)
-    console.log("✅ One tile loaded from NASA GIBS — layer is working.");
-    gibsLayer.off("tileload"); // stop logging repeatedly
+  infrared.on("tileload", (e) => {
+    console.log("✅ Infrared tile loaded (sample).");
+    infrared.off("tileload");
+  });
+  infrared.on("tileerror", (e) => {
+    console.error("Tile error (Infrared):", e);
   });
 
   console.log(
-    "✅ Leaflet map initialized. Open Network tab to see gibs requests."
+    "✅ Leaflet map initialized. Open DevTools → Network to see gibs requests."
   );
 });
