@@ -1,0 +1,28 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #0b1a2a;
+  color: #f0f0f0;
+  text-align: center;
+}
+
+header {
+  background: #133b5c;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+main {
+  min-height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  color: #7ad3ff;
+}
+
+footer {
+  background: #102a43;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
