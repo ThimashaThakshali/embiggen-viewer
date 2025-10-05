@@ -1,6 +1,6 @@
 // main.js — Step 8D: Classic Leaflet Layer Control + Date + Opacity + Annotations
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🚀 Initializing BloomWatch (Layer Control Mode)...");
+  console.log("🚀 Initializing Embiggen Your Eyes (Layer Control Mode)...");
 
   const map = L.map("map", {
     center: [0, 0],
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // --- Persistent annotations
-  const STORAGE_KEY = "bloomwatch-annotations";
+  const STORAGE_KEY = "embiggen-your-eyes-annotations";
   let annotations = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
   annotations.forEach((a) => {
     const marker = L.marker([a.lat, a.lng]).addTo(map);
