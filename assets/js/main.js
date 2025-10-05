@@ -1,4 +1,4 @@
-// main.js — Step 9: Dataset Selector + Layer Control + Date + Opacity + Annotations
+// main.js — Step 9–11: Dataset Selector + Layers + Date + Opacity + Annotations + EONET Events
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🚀 Initializing Embiggen Your Eyes with dataset selector...");
 
@@ -14,9 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const DATASETS = {
     Earth: {
       trueColor: (date) =>
-        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/${date}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`,
+        `https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/${date}/250m/{z}/{y}/{x}.jpg`,
+
       infrared: (date) =>
-        `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_Bands367/default/${date}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`,
+        `https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/MODIS_Terra_CorrectedReflectance_Bands367/default/${date}/250m/{z}/{y}/{x}.jpg`,
+
       maxZoom: 9,
     },
     Moon: {
@@ -43,8 +45,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const dateLabel = document.getElementById("selectedDate");
   const opacitySlider = document.getElementById("opacitySlider");
   const datasetSelect = document.getElementById("dataset");
+  const modeSelect = document.getElementById("modeSelect");
+  const showEventsCheckbox = document.getElementById("showEvents");
 
-  // --- Helper to build NASA/trek layers
   // --- Helper to build NASA/trek layers
   function makeLayer(dataset, type, date) {
     let url = "";
@@ -61,18 +64,24 @@ document.addEventListener("DOMContentLoaded", () => {
         type === "infrared"
           ? DATASETS.Earth.infrared(date)
           : DATASETS.Earth.trueColor(date);
+
+      // Infrared native tiles only go to level 8 — tell Leaflet to use level 8 as native
+      if (type === "infrared") {
+        options.maxNativeZoom = 8; // use level-8 tiles when zoomed further
+        options.maxZoom = 9; // keep options.maxZoom = 9 so map can zoom to 9 (tiles will be upscaled)
+      }
     } else if (dataset === "Moon") {
       url = DATASETS.Moon.base();
       options.bounds = [
         [-90, -180],
         [90, 180],
-      ]; // full Moon extent
+      ];
     } else if (dataset === "Mars") {
       url = DATASETS.Mars.base();
       options.bounds = [
         [-90, -180],
         [90, 180],
-      ]; // full Mars extent
+      ];
     }
 
     return L.tileLayer(url, options);
@@ -96,21 +105,46 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   let layerControl = L.control.layers(layers).addTo(map);
 
-  // Add Leaflet side-by-side plugin dynamically
+  // --- Load leaflet-side-by-side (browser UMD build) and wait for it to be ready
+  let sideBySideReady = false;
   const sideBySideScript = document.createElement("script");
-  sideBySideScript.src = "https://unpkg.com/leaflet-side-by-side";
+  // Use the browser-friendly minified UMD file (do not load package root)
+  sideBySideScript.src =
+    "https://unpkg.com/leaflet-side-by-side@2.0.1/leaflet-side-by-side.min.js";
+  sideBySideScript.crossOrigin = "";
+  sideBySideScript.onload = () => {
+    sideBySideReady = true;
+    console.log("✅ leaflet-side-by-side loaded (ready).");
+  };
+  sideBySideScript.onerror = (e) => {
+    console.warn(
+      "⚠️ Failed to load leaflet-side-by-side plugin. Swipe mode will be unavailable.",
+      e
+    );
+  };
   document.head.appendChild(sideBySideScript);
 
   // --- Date slider
   slider.addEventListener("input", () => {
-    if (currentDataset !== "Earth") return; // only Earth has time series
+    if (currentDataset !== "Earth") return;
     baseDate = availableDates[slider.value];
     dateLabel.textContent = baseDate;
     map.removeLayer(currentLayer);
 
-    if (currentLayer === infrared) {
-      currentLayer = makeLayer("Earth", "infrared", baseDate).addTo(map);
+    // Note: comparing by object equality can be brittle if layer instances are re-created.
+    // We conservatively try to recreate the same *type* of layer as currently selected.
+    // If the active layer name exists in layer control, we can check via its tile URL,
+    // but for simplicity we check pixel approximations:
+    if (currentLayer && currentLayer.getTileUrl) {
+      // crude check: if URL contains "Bands367" treat as infrared else trueColor
+      const tmpUrl = currentLayer._url || "";
+      if (tmpUrl.includes("Bands367")) {
+        currentLayer = makeLayer("Earth", "infrared", baseDate).addTo(map);
+      } else {
+        currentLayer = makeLayer("Earth", "trueColor", baseDate).addTo(map);
+      }
     } else {
+      // fallback: default to trueColor
       currentLayer = makeLayer("Earth", "trueColor", baseDate).addTo(map);
     }
   });
@@ -122,24 +156,55 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // --- Sync top layer when base changes (only for Earth)
+  // --- Sync top layer when base changes
   map.on("baselayerchange", (e) => {
     if (currentDataset !== "Earth") return;
     console.log("🛰️ Switched layer:", e.name);
-    map.removeLayer(topLayer);
+    if (topLayer) map.removeLayer(topLayer);
+
+    const useInfra = e.name && e.name.includes("Infrared");
     topLayer = makeLayer(
       "Earth",
-      e.name.includes("Infrared") ? "infrared" : "trueColor",
+      useInfra ? "infrared" : "trueColor",
       compareDate
     ).addTo(map);
-    topLayer.setOpacity(parseFloat(opacitySlider.value));
+    if (topLayer && topLayer.setOpacity)
+      topLayer.setOpacity(parseFloat(opacitySlider.value));
     currentLayer = e.layer;
+  });
+
+  // --- Compare date dropdown
+  const compareSelect = document.getElementById("compareSelect");
+  compareSelect.addEventListener("change", () => {
+    if (currentDataset !== "Earth") return;
+    compareDate = compareSelect.value;
+
+    if (topLayer) {
+      map.removeLayer(topLayer);
+    }
+
+    const useInfra =
+      currentLayer &&
+      currentLayer._url &&
+      currentLayer._url.includes("Bands367");
+
+    topLayer = makeLayer(
+      "Earth",
+      useInfra ? "infrared" : "trueColor",
+      compareDate
+    ).addTo(map);
+
+    if (topLayer && topLayer.setOpacity) {
+      topLayer.setOpacity(parseFloat(opacitySlider.value));
+    }
+
+    console.log("🔁 Compare date changed to:", compareDate);
   });
 
   // --- Dataset switch
   datasetSelect.addEventListener("change", () => {
     currentDataset = datasetSelect.value;
-    map.eachLayer((layer) => map.removeLayer(layer)); // Clear map
+    map.eachLayer((layer) => map.removeLayer(layer));
 
     if (currentDataset === "Earth") {
       trueColor = makeLayer("Earth", "trueColor", baseDate);
@@ -151,44 +216,56 @@ document.addEventListener("DOMContentLoaded", () => {
         "True Color (MODIS Terra)": trueColor,
         "Infrared (Bands 367)": infrared,
       };
+      // re-add layer control
+      if (layerControl) {
+        try {
+          map.removeControl(layerControl);
+        } catch (e) {}
+      }
       layerControl = L.control.layers(layers).addTo(map);
     } else {
       currentLayer = makeLayer(currentDataset, "base").addTo(map);
-      // remove Earth-specific layer control
       if (layerControl) {
-        map.removeControl(layerControl);
+        try {
+          map.removeControl(layerControl);
+        } catch (e) {}
       }
-      topLayer = null; // no comparison layer for Moon/Mars
+      topLayer = null;
     }
 
     console.log("🔄 Dataset switched to:", currentDataset);
   });
 
-  const modeSelect = document.getElementById("modeSelect");
   let sideBySideControl = null;
-
   modeSelect.addEventListener("change", () => {
     const mode = modeSelect.value;
-
     // Clear existing compare mode
     if (sideBySideControl) {
-      map.removeControl(sideBySideControl);
+      try {
+        map.removeControl(sideBySideControl);
+      } catch (e) {}
       sideBySideControl = null;
     }
     if (topLayer) {
-      map.removeLayer(topLayer);
+      try {
+        map.removeLayer(topLayer);
+      } catch (e) {}
     }
 
     if (mode === "opacity") {
-      // Restore opacity comparison
       if (currentDataset === "Earth") {
         topLayer = makeLayer("Earth", "trueColor", compareDate).addTo(map);
-        topLayer.setOpacity(parseFloat(opacitySlider.value));
+        if (topLayer && topLayer.setOpacity)
+          topLayer.setOpacity(parseFloat(opacitySlider.value));
       }
       console.log("🌓 Using opacity mode");
     } else if (mode === "swipe") {
-      // Enable side-by-side comparison
       if (currentDataset === "Earth") {
+        if (!sideBySideReady || typeof L.control.sideBySide !== "function") {
+          alert("Swipe plugin not ready yet — please try again in a moment.");
+          modeSelect.value = "opacity";
+          return;
+        }
         let leftLayer = makeLayer("Earth", "trueColor", baseDate).addTo(map);
         let rightLayer = makeLayer("Earth", "trueColor", compareDate).addTo(
           map
@@ -200,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
         topLayer = rightLayer;
       } else {
         alert("Swipe mode is only supported for Earth dataset.");
-        modeSelect.value = "opacity"; // fallback
+        modeSelect.value = "opacity";
       }
       console.log("🔀 Using swipe mode");
     }
@@ -228,5 +305,47 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(annotations));
   });
 
-  console.log("✅ Classic layer control + dataset selector ready!");
+  // --- ✅ NASA EONET Events (inside DOMContentLoaded)
+  let eventMarkers = L.layerGroup().addTo(map);
+
+  async function fetchEONETEvents() {
+    try {
+      const response = await fetch(
+        "https://eonet.gsfc.nasa.gov/api/v3/events?status=open"
+      );
+      const data = await response.json();
+
+      eventMarkers.clearLayers();
+
+      data.events.forEach((event) => {
+        if (!event.geometry || !event.geometry.length) return;
+
+        const { coordinates } = event.geometry[0];
+        const [lon, lat] = coordinates;
+
+        const marker = L.marker([lat, lon]).bindPopup(
+          `<b>${event.title}</b><br>
+           Category: ${event.categories[0].title}<br>
+           <a href="${event.sources[0].url}" target="_blank">🔗 Details</a>`
+        );
+        eventMarkers.addLayer(marker);
+      });
+
+      console.log("🌍 Loaded EONET events:", data.events.length);
+    } catch (err) {
+      console.error("❌ Failed to fetch EONET events", err);
+    }
+  }
+
+  showEventsCheckbox.addEventListener("change", () => {
+    if (showEventsCheckbox.checked) {
+      fetchEONETEvents();
+      map.addLayer(eventMarkers);
+    } else {
+      eventMarkers.clearLayers();
+      map.removeLayer(eventMarkers);
+    }
+  });
+
+  console.log("✅ Viewer ready with datasets, modes, annotations, and events!");
 });
