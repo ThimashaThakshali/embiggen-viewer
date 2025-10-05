@@ -96,6 +96,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   let layerControl = L.control.layers(layers).addTo(map);
 
+  // Add Leaflet side-by-side plugin dynamically
+  const sideBySideScript = document.createElement("script");
+  sideBySideScript.src = "https://unpkg.com/leaflet-side-by-side";
+  document.head.appendChild(sideBySideScript);
+
   // --- Date slider
   slider.addEventListener("input", () => {
     if (currentDataset !== "Earth") return; // only Earth has time series
@@ -157,6 +162,48 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     console.log("🔄 Dataset switched to:", currentDataset);
+  });
+
+  const modeSelect = document.getElementById("modeSelect");
+  let sideBySideControl = null;
+
+  modeSelect.addEventListener("change", () => {
+    const mode = modeSelect.value;
+
+    // Clear existing compare mode
+    if (sideBySideControl) {
+      map.removeControl(sideBySideControl);
+      sideBySideControl = null;
+    }
+    if (topLayer) {
+      map.removeLayer(topLayer);
+    }
+
+    if (mode === "opacity") {
+      // Restore opacity comparison
+      if (currentDataset === "Earth") {
+        topLayer = makeLayer("Earth", "trueColor", compareDate).addTo(map);
+        topLayer.setOpacity(parseFloat(opacitySlider.value));
+      }
+      console.log("🌓 Using opacity mode");
+    } else if (mode === "swipe") {
+      // Enable side-by-side comparison
+      if (currentDataset === "Earth") {
+        let leftLayer = makeLayer("Earth", "trueColor", baseDate).addTo(map);
+        let rightLayer = makeLayer("Earth", "trueColor", compareDate).addTo(
+          map
+        );
+        sideBySideControl = L.control
+          .sideBySide(leftLayer, rightLayer)
+          .addTo(map);
+        currentLayer = leftLayer;
+        topLayer = rightLayer;
+      } else {
+        alert("Swipe mode is only supported for Earth dataset.");
+        modeSelect.value = "opacity"; // fallback
+      }
+      console.log("🔀 Using swipe mode");
+    }
   });
 
   // --- Persistent annotations
