@@ -1,29 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Embiggen Viewer</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Embiggen Viewer</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+
   <!-- Leaflet core -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- ✅ Add swipe plugin here to avoid CORS error -->
-<script src="https://unpkg.com/leaflet-side-by-side@2.0.1/leaflet-side-by-side.min.js"></script>
+  <!-- Leaflet Side-by-Side -->
+  <script src="https://unpkg.com/leaflet-side-by-side@2.0.1/leaflet-side-by-side.min.js"></script>
 
-<!-- Your script -->
-<script src="assets/js/main.js"></script
+  <!-- Leaflet MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 </head>
 <body>
   <header>
-    <h1> <span class = "earth-icon">🌍</span><span>Embiggen Viewer</span></h1>
+    <h1><span class="earth-icon">🌍</span><span>Embiggen Viewer</span></h1>
     <p>Explore gigapixel NASA Earth imagery</p>
   </header>
 
+  <!-- Dataset selector -->
   <section id="datasetSelect" style="text-align:center; padding:1rem;">
     <label for="dataset">🌌 Select Dataset: </label>
     <select id="dataset">
@@ -33,61 +34,67 @@
     </select>
   </section>
 
-  
-
+  <!-- View mode -->
   <section id="viewMode" style="text-align:center; padding:1rem;">
-  <label for="modeSelect">🔍 View Mode: </label>
-  <select id="modeSelect">
-    <option value="opacity" selected>Opacity (default)</option>
-    <option value="swipe">Swipe</option>
-  </select>
-</section>
+    <label for="modeSelect">🔍 View Mode: </label>
+    <select id="modeSelect">
+      <option value="opacity" selected>Opacity (default)</option>
+      <option value="swipe">Swipe</option>
+    </select>
+  </section>
 
-<section id="eventsToggle" style="text-align:center; padding:1rem;">
-  <label>
-    <input type="checkbox" id="showEvents"> 🌋 Show NASA EONET Events
-  </label>
-</section>
+  <!-- Events -->
+  <section id="eventsToggle" style="text-align:center; padding:1rem;">
+    <label>
+      <input type="checkbox" id="showEvents"/> 🌋 Show NASA EONET Events
+    </label>
+  </section>
 
- <main id="viewer">
-    <!-- Leaflet map container -->
+  <!-- Event filters -->
+  <section id="eventControls" style="text-align:center; padding:1rem;">
+    <label for="eventLimit">🎯 Max Events: </label>
+    <input type="range" id="eventLimit" min="50" max="1000" step="50" value="200"/>
+    <span id="eventLimitValue">200</span>
+
+    <label style="margin-left:20px;">
+      <input type="checkbox" id="filterByBounds"/> 🔎 Only show events in view
+    </label>
+  </section>
+
+  <!-- Map -->
+  <main id="viewer">
     <div id="map" style="width:100%; height:80vh; background:#000;"></div>
- </main>
+  </main>
 
+  <!-- Date slider -->
+  <section id="controls" style="text-align:center; padding:1rem;">
+    <label for="dateSlider">🕓 Select Date: </label>
+    <input type="range" id="dateSlider" min="0" max="4" step="1" value="4"/>
+    <span id="selectedDate" style="font-weight:bold;">2025-09-01</span>
+  </section>
 
- <section id="controls" style="text-align:center; padding:1rem;">
-  <label for="dateSlider">🕓 Select Date: </label>
-  <input type="range" id="dateSlider" min="0" max="4" step="1" value="4">
-  <span id="selectedDate" style="font-weight:bold;">2025-09-01</span>
-</section>
+  <!-- Compare opacity -->
+  <section id="compare" style="text-align:center; padding:1rem;">
+    <label for="opacitySlider">🌓 Compare Opacity: </label>
+    <input type="range" id="opacitySlider" min="0" max="1" step="0.05" value="1"/>
+  </section>
 
-<section id="compare" style="text-align:center; padding:1rem;">
-  <label for="opacitySlider">🌓 Compare Opacity: </label>
-  <input type="range" id="opacitySlider" min="0" max="1" step="0.05" value="1">
-</section>
+  <!-- Compare date -->
+  <section id="compareDate" style="text-align:center; padding:1rem;">
+    <label for="compareSelect">🔁 Compare With Date: </label>
+    <select id="compareSelect">
+      <option value="2025-08-01">2025-08-01</option>
+      <option value="2025-07-01">2025-07-01</option>
+      <option value="2025-06-01">2025-06-01</option>
+      <option value="2025-05-01">2025-05-01</option>
+    </select>
+  </section>
 
-<section id="compareDate" style="text-align:center; padding:1rem;">
-  <label for="compareSelect">🔁 Compare With Date: </label>
-  <select id="compareSelect">
-    <option value="2025-08-01">2025-08-01</option>
-    <option value="2025-07-01">2025-07-01</option>
-    <option value="2025-06-01">2025-06-01</option>
-    <option value="2025-05-01">2025-05-01</option>
-  </select>
-</section>
-
- <footer>
+  <footer>
     <p>Powered by NASA GIBS | Built for Space Apps Challenge</p>
   </footer>
 
-  <!-- ✅ Clean Leaflet CDN links (no integrity checks) -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Your script must load *after* Leaflet -->
+  <!-- Main script -->
   <script src="assets/js/main.js"></script>
 </body>
 </html>
