@@ -1,54 +1,59 @@
-/* assets/css/style.css — Step 3: Map chrome polish + responsive tweaks */
+/* assets/css/style.css — Step 4: Final polish (hover states, accessibility, finishing touches) */
 
-/* Base reset */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html,body { height: 100%; }
+/* Reset & base */
+* { box-sizing: border-box; margin:0; padding:0; }
+html,body { height:100%; }
 
-/* Body + theme */
 body {
   font-family: Inter, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(180deg,#050617 0%, #0b1a2a 62%);
-  color: #e6f0ff;
+  background: linear-gradient(180deg,#050617 0%, #081225 65%);
+  color:#e6f0ff;
   -webkit-font-smoothing:antialiased;
 }
 
 /* Header */
 header {
-  background: linear-gradient(90deg, rgba(17,24,39,0.96), rgba(7,12,24,0.85));
-  padding: 14px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 18px;
+  background: linear-gradient(90deg, rgba(16,24,36,0.96), rgba(8,12,22,0.86));
   border-bottom: 1px solid rgba(255,255,255,0.02);
-  position: sticky; top: 0; z-index: 1000;
-  box-shadow: 0 8px 30px rgba(2,6,23,0.5);
+  position: sticky; top:0; z-index:1100;
 }
-header h1 { font-size: 20px; display:inline-block; margin-right:10px; color:#dbeafe; }
-header p { color:#97b3da; font-size:13px; display:inline-block; }
 
-/* Top inline control pills */
+header .title {
+  display:flex; flex-direction:column;
+}
+header h1 { font-size:18px; font-weight:700; color:#dbeafe; }
+header p { font-size:13px; color:#9fb4d8; margin-top:4px; }
+
+/* Top control pills */
 section#datasetSelect,
 section#viewMode,
 section#eventsToggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  margin: 10px 8px;
-  border-radius: 12px;
+  display:inline-flex; align-items:center; gap:10px;
+  padding:10px 14px; margin:10px 8px;
+  border-radius:12px;
   background: linear-gradient(180deg, rgba(10,16,28,0.5), rgba(8,12,20,0.4));
   border: 1px solid rgba(59,130,246,0.06);
-  color: #dbeafe;
+  color:#dbeafe;
+  transition: transform .12s ease, box-shadow .12s ease;
 }
+section#datasetSelect:hover,
+section#viewMode:hover,
+section#eventsToggle:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(59,130,246,0.08); }
+section#datasetSelect:focus-within,
+section#viewMode:focus-within,
+section#eventsToggle:focus-within { box-shadow: 0 0 0 4px rgba(59,130,246,0.06); }
 
 /* Lower controls */
 #controls, #compare, #compareDate {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  margin: 10px 8px;
-  border-radius: 12px;
+  display:inline-flex; align-items:center; gap:12px;
+  padding:10px 14px; margin:10px 8px; border-radius:12px;
   background: linear-gradient(180deg, rgba(8,14,24,0.45), rgba(6,10,20,0.35));
   border: 1px solid rgba(255,255,255,0.02);
-  color: #dbeafe;
 }
 
 /* Responsive stacking */
@@ -59,66 +64,59 @@ section#eventsToggle {
   }
 }
 
-/* Select & range styling */
+/* Inputs */
 select {
-  padding: 8px 12px;
-  background: rgba(8,12,22,0.65);
-  border: 1px solid rgba(255,255,255,0.03);
-  color: #e6f0ff;
-  border-radius: 8px;
-  min-width: 170px;
+  padding:8px 12px; border-radius:8px; min-width:170px;
+  background: rgba(8,12,22,0.7); border: 1px solid rgba(255,255,255,0.03);
+  color: #e6f0ff; cursor:pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233b82f6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat; background-position: right 10px center;
 }
+select:focus { outline: none; box-shadow: 0 0 0 4px rgba(59,130,246,0.055); }
 
+/* Range sliders */
 input[type="range"] {
-  -webkit-appearance: none; width: 240px; height: 8px; border-radius: 6px;
-  background: linear-gradient(90deg, rgba(59,130,246,0.1), rgba(59,130,246,0.35));
+  -webkit-appearance: none; width: 240px; height:8px; border-radius:6px;
+  background: linear-gradient(90deg, rgba(59,130,246,0.08), rgba(59,130,246,0.4));
 }
-
-/* range thumb */
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
-  background: linear-gradient(135deg,#3b82f6,#60a5fa); box-shadow: 0 4px 16px rgba(59,130,246,0.22);
+  background: linear-gradient(135deg,#3b82f6,#60a5fa); box-shadow:0 6px 20px rgba(59,130,246,0.18);
 }
 
-/* Map area polish */
-main#viewer { padding: 12px 14px 18px 14px; }
+/* Map */
+main#viewer { padding:12px 14px 18px; }
 #map {
-  width: 100%;
-  height: calc(100vh - 260px) !important;
-  border-radius: 10px;
-  background:#000;
+  width:100%; height: calc(100vh - 260px) !important;
+  border-radius:10px; overflow:hidden; background:#000;
   border: 1px solid rgba(255,255,255,0.02);
-  box-shadow: 0 18px 50px rgba(2,6,23,0.7), inset 0 8px 28px rgba(0,0,0,0.65);
-  position: relative;
+  box-shadow: 0 18px 48px rgba(2,6,23,0.7), inset 0 8px 28px rgba(0,0,0,0.5);
+  position:relative;
 }
 
-/* map overlay hint (pure css, placed inside leaflet's container via :after) */
+/* map hint overlay (decorative) */
 .leaflet-container:after {
   content: "Click to add annotation • Toggle events to show active natural events";
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  background: rgba(6,12,24,0.8);
-  color: #9fb4d8;
-  font-size: 12px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.02);
-  pointer-events: none;
-  z-index: 1200;
+  position:absolute; right:14px; bottom:14px;
+  background: rgba(6,12,24,0.82); color:#9fb4d8; font-size:12px;
+  padding:8px 12px; border-radius:8px; pointer-events:none; z-index:1200;
 }
 
-/* Attribution & zoom controls */
-.leaflet-control-attribution { background: rgba(6,12,24,0.85) !important; color:#9fb4d8 !important; padding:6px 8px !important; border-radius:6px!important; }
+/* Leaflet controls */
+.leaflet-control-attribution { background: rgba(6,12,24,0.85) !important; color:#9fb4d8 !important; padding:6px 8px !important; border-radius:6px !important; }
 .leaflet-control-zoom a { background: rgba(8,12,20,0.92)!important; border: 1px solid rgba(255,255,255,0.03)!important; color:#cfe9ff!important; }
 
 /* Footer */
-footer { padding:12px 18px; text-align:center; color:#9fb4d8; font-size:13px; }
+footer { padding:12px 18px; text-align:center; color:#9fb4d8; font-size:13px; border-top:1px solid rgba(255,255,255,0.02); }
 
-/* small adjustments for very small screens */
-@media (max-width: 480px) {
+/* Accessibility: focus outlines for keyboard users */
+a:focus, button:focus, input:focus, select:focus {
+  outline: 3px solid rgba(59,130,246,0.12);
+  outline-offset: 2px;
+}
+
+/* Small screen tweaks */
+@media (max-width:480px) {
   #map { height: calc(100vh - 360px) !important; }
   select { min-width: 100%; }
 }
