@@ -1,48 +1,33 @@
-/* assets/css/style.css — Step 1: Base theme + header polish */
+/* assets/css/style.css — Step 2: Control cards + inputs polish */
 
-/* Global reset & composition */
+/* Global reset & base theme (same as step 1) */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html,body { height: 100%; }
 
 body {
-  font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: Inter, "Segoe UI", Roboto, sans-serif;
   background: linear-gradient(180deg,#06081a 0%, #0b1a2a 60%);
   color: #e6f0ff;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 /* Header */
 header {
   background: linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(8,18,34,0.85));
-  padding: 18px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
-  box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 6px 22px rgba(2,6,23,0.6);
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
-header h1 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #dbeafe;
-  letter-spacing: -0.2px;
-  display:inline-block;
-  margin-right: 1rem;
-}
+header h1 { font-size: 20px; font-weight: 700; color: #dbeafe; display:inline-block; margin-right:12px; }
+header p { display:inline-block; color: #9fb4d8; font-size:13px; }
 
-header p {
-  display:inline-block;
-  color: #9fb4d8;
-  font-size: 13px;
-  margin-left: 6px;
-  vertical-align: middle;
-}
-
-/* Small utility container for top inline controls (they are separate elements in the HTML,
-   we style each to behave inline so they flow horizontally on wide screens) */
+/* Top inline controls — behave like pills that flow horizontally */
 section#datasetSelect,
 section#viewMode,
 section#eventsToggle {
@@ -51,59 +36,40 @@ section#eventsToggle {
   gap: 10px;
   padding: 12px 14px;
   margin: 12px 10px;
-  background: rgba(12,22,36,0.45);
-  border: 1px solid rgba(255,255,255,0.03);
-  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(16,24,40,0.55), rgba(8,14,26,0.45));
+  border-radius: 12px;
+  border: 1px solid rgba(59,130,246,0.06);
   backdrop-filter: blur(6px);
-  color: #cfe9ff;
-  vertical-align: middle;
-  box-shadow: 0 6px 18px rgba(3,10,30,0.45);
+  color: #dbeafe;
+  box-shadow: 0 8px 24px rgba(3,10,30,0.35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+section#datasetSelect:hover,
+section#viewMode:hover,
+section#eventsToggle:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(59,130,246,0.12);
 }
 
-/* Make the controls flow and wrap on small screens */
-@media (max-width: 820px) {
-  section#datasetSelect,
-  section#viewMode,
-  section#eventsToggle {
-    display: block;
-    width: calc(100% - 40px);
-    margin: 10px 20px;
-  }
-}
-
-/* Main viewer container */
-main#viewer {
-  padding: 0 14px 18px 14px;
-}
-
-/* Map container (override inline style height with flexible responsive calc) */
-#map {
-  width: 100%;
-  height: calc(100vh - 260px) !important; /* header + control areas ~260px */
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(2,6,23,0.7) inset;
-  border: 1px solid rgba(255,255,255,0.02);
-  background: #000;
-}
-
-/* Lower control row (date/opacity/compare) — group look */
+/* Lower controls — group style and consistent spacing */
 #controls, #compare, #compareDate {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   margin: 12px 10px;
-  background: rgba(10,16,26,0.45);
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.025);
-  color: #cfe9ff;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 6px 18px rgba(3,10,30,0.35);
+  background: linear-gradient(180deg, rgba(10,18,30,0.45), rgba(8,14,26,0.35));
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.02);
+  color: #dbeafe;
+  box-shadow: 0 8px 20px rgba(2,6,23,0.5);
 }
 
-/* keep them stacked on small screens */
+/* Responsive stacking on small screens */
 @media (max-width: 820px) {
+  section#datasetSelect,
+  section#viewMode,
+  section#eventsToggle,
   #controls, #compare, #compareDate {
     display: block;
     width: calc(100% - 40px);
@@ -112,41 +78,53 @@ main#viewer {
 }
 
 /* Select styling */
-select, input[type="range"], input[type="checkbox"] {
-  font-family: inherit;
-  color: inherit;
-}
-
-/* Styled select */
 select {
   min-width: 180px;
-  padding: 8px 12px;
-  background: rgba(6,12,28,0.6);
+  padding: 8px 14px;
+  background: rgba(8,14,26,0.7);
   border: 1px solid rgba(255,255,255,0.04);
   border-radius: 8px;
   color: #e6f0ff;
-  appearance: none;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233b82f6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
 
-/* Range slider look (simple but modern) */
+/* select focus */
+select:focus { outline: none; box-shadow: 0 0 0 4px rgba(59,130,246,0.06); }
+
+/* Range slider */
 input[type="range"] {
   -webkit-appearance: none;
-  width: 240px;
+  width: 260px;
   height: 8px;
   border-radius: 6px;
-  background: linear-gradient(90deg, rgba(59,130,246,0.15), rgba(59,130,246,0.35));
+  background: linear-gradient(90deg, rgba(59,130,246,0.15), rgba(59,130,246,0.45));
   outline: none;
 }
 
-/* Range thumb */
+/* Thumb */
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: linear-gradient(135deg,#3b82f6,#60a5fa);
-  box-shadow: 0 3px 10px rgba(59,130,246,0.25);
+  box-shadow: 0 4px 14px rgba(59,130,246,0.28);
+}
+
+/* map container */
+main#viewer { padding: 12px 14px 18px 14px; }
+#map {
+  width: 100%;
+  height: calc(100vh - 260px) !important;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255,255,255,0.02);
+  box-shadow: 0 20px 40px rgba(2,6,23,0.6) inset;
 }
 
 /* Footer */
@@ -159,12 +137,12 @@ footer {
   background: linear-gradient(180deg, rgba(3,6,20,0.0), rgba(3,6,20,0.6));
 }
 
-/* Leaflet UI tweaks (small, purely cosmetic) */
+/* Leaflet tweaks for visual coherence */
 .leaflet-control-attribution {
-  background: rgba(6,12,24,0.8) !important;
+  background: rgba(6,12,24,0.75) !important;
   color: #9fb4d8 !important;
   padding: 6px 8px !important;
-  border-radius: 5px !important;
+  border-radius: 6px !important;
   font-size: 12px !important;
 }
 
@@ -172,11 +150,4 @@ footer {
   background: rgba(8,12,20,0.9) !important;
   border: 1px solid rgba(255,255,255,0.03) !important;
   color: #cfe9ff !important;
-}
-
-/* small responsive tweak for header text on mobile */
-@media (max-width: 480px) {
-  header h1 { font-size: 18px; display:block; margin-bottom:6px; }
-  header p { display:block; font-size:12px; margin-top:2px; }
-  #map { height: calc(100vh - 320px) !important; }
 }
