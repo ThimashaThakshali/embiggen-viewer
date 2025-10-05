@@ -45,9 +45,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const datasetSelect = document.getElementById("dataset");
 
   // --- Helper to build NASA/trek layers
+  // --- Helper to build NASA/trek layers
   function makeLayer(dataset, type, date) {
     let url = "";
     let maxZoom = DATASETS[dataset].maxZoom;
+    let options = {
+      attribution: "&copy; NASA GIBS & Solar System Treks",
+      maxZoom: maxZoom,
+      tileSize: 256,
+      noWrap: true,
+    };
 
     if (dataset === "Earth") {
       url =
@@ -56,16 +63,19 @@ document.addEventListener("DOMContentLoaded", () => {
           : DATASETS.Earth.trueColor(date);
     } else if (dataset === "Moon") {
       url = DATASETS.Moon.base();
+      options.bounds = [
+        [-90, -180],
+        [90, 180],
+      ]; // full Moon extent
     } else if (dataset === "Mars") {
       url = DATASETS.Mars.base();
+      options.bounds = [
+        [-90, -180],
+        [90, 180],
+      ]; // full Mars extent
     }
 
-    return L.tileLayer(url, {
-      attribution: "&copy; NASA GIBS & Solar System Treks",
-      maxZoom: maxZoom,
-      tileSize: 256,
-      noWrap: true,
-    });
+    return L.tileLayer(url, options);
   }
 
   let baseDate = availableDates[4];
