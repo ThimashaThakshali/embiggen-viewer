@@ -13,19 +13,57 @@ body {
 
 /* Header */
 header {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:14px 18px;
-  background: linear-gradient(90deg, rgba(16,24,36,0.96), rgba(8,12,22,0.86));
-  border-bottom: 1px solid rgba(255,255,255,0.02);
-  position: sticky; top:0; z-index:1100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 18px;
+  background: linear-gradient(
+    90deg, 
+    rgba(18,24,42,0.95), 
+    rgba(10,18,30,0.85)
+  );
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1100;
 }
 
 header .title { display:flex; flex-direction:column; }
-header h1 { font-size:18px; font-weight:700; color:#dbeafe; }
-header p { font-size:13px; color:#9fb4d8; margin-top:4px; }
+
+/* Title */
+header h1 span {
+  font-size: 48px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 8px;
+
+  background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  text-shadow: 0 0 18px rgba(96,165,250,0.3),
+               0 0 28px rgba(167,139,250,0.25),
+               0 0 48px rgba(244,114,182,0.2);
+}
+
+/* Keep 🌍 emoji natural */
+header h1 .earth-icon {
+  -webkit-text-fill-color: initial; /* resets fill */
+  background: none;
+  text-shadow: none; /* no glow on emoji */
+  margin-right: 6px;
+}
+/* Tagline */
+header p {
+    margin-top: 10px;
+  font-size: 17px;
+  color: #c7d8f5;
+  text-align: center;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px rgba(96,165,250,0.2);
+}
 
 /* Top control pills */
 section#datasetSelect,

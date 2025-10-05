@@ -3,12 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Embiggen Viewer</title>
+  <title> Embiggen Viewer</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <!-- Leaflet core -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- ✅ Add swipe plugin here to avoid CORS error -->
+<script src="https://unpkg.com/leaflet-side-by-side@2.0.1/leaflet-side-by-side.min.js"></script>
+
+<!-- Your script -->
+<script src="assets/js/main.js"></script
 </head>
 <body>
   <header>
-    <h1>🌍 Embiggen Viewer</h1>
+    <h1> <span class = "earth-icon">🌍</span><span>Embiggen Viewer</span></h1>
     <p>Explore gigapixel NASA Earth imagery</p>
   </header>
 
@@ -21,12 +33,20 @@
     </select>
   </section>
 
+  
+
   <section id="viewMode" style="text-align:center; padding:1rem;">
   <label for="modeSelect">🔍 View Mode: </label>
   <select id="modeSelect">
     <option value="opacity" selected>Opacity (default)</option>
     <option value="swipe">Swipe</option>
   </select>
+</section>
+
+<section id="eventsToggle" style="text-align:center; padding:1rem;">
+  <label>
+    <input type="checkbox" id="showEvents"> 🌋 Show NASA EONET Events
+  </label>
 </section>
 
  <main id="viewer">
