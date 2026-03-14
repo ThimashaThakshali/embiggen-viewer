@@ -1,113 +1,41 @@
+# Embiggen Viewer
 
-# Personal Portfolio Website
+Embiggen Viewer is a lightweight web-based visualization tool that allows users to explore high-resolution Earth and space imagery using publicly available satellite data.
 
-This is my personal portfolio website showcasing my projects, technical skills, experience, and achievements as a Software Engineer.
-
-The website highlights my work in full-stack development, machine learning, mobile applications, and software engineering projects.
-
----
-
-## 🌐 Live Website
-
-Visit the portfolio here:
-
-https://thimashathakshali.github.io/portfolio/
+The application integrates NASA's Global Imagery Browse Services (GIBS) and Leaflet.js to provide an interactive interface for exploring satellite imagery layers.
 
 ---
 
-## 👩‍💻 About Me
+## 🌍 Features
 
-I am a Software Engineer with experience in:
-
-- Full-stack web development
-- Machine learning systems
-- mobile and wearable applications
-- secure and privacy-focused systems
-
-I hold a **BEng (Hons) in Software Engineering** from the **Informatics Institute of Technology (IIT), affiliated with the University of Westminster (UK).**
-
-I also work as a **Visiting Lecturer at IIT**, teaching software engineering and client–server architecture modules.
+- Interactive satellite imagery exploration
+- High-resolution Earth and space imagery
+- Map-based visualization using Leaflet.js
+- Integration with NASA GIBS imagery services
+- Smooth zooming and panning
+- Lightweight and responsive interface
 
 ---
 
-## 🚀 Features
+## 🛰 Data Source
 
-The portfolio includes:
+This project uses imagery provided by:
 
-- Responsive modern UI
-- Interactive project showcase
-- Skills and experience sections
-- Achievements and hackathon results
-- AI-powered portfolio assistant chatbot
-- Recruiter-friendly project descriptions
-- Smooth scrolling navigation
-- GitHub and demo links for each project
+- **NASA Global Imagery Browse Services (GIBS)**
+- Public satellite datasets
+
+These services allow developers to access global satellite imagery layers in real time.
 
 ---
 
 ## 🛠 Technologies Used
 
-### Frontend
-
-- React
-- JavaScript
 - HTML
 - CSS
-- Tailwind CSS
-
-### Tools
-
-- Vite
-- Git
-- GitHub Pages
-
-### UI Libraries
-
-- Lucide Icons
+- JavaScript
+- Leaflet.js
+- NASA GIBS API
 
 ---
 
-## 📂 Portfolio Sections
-
-The portfolio contains the following sections:
-
-- Hero
-- About
-- Skills
-- Work Experience
-- Projects
-- Achievements
-- Contact
-
----
-
-## 📊 Featured Projects
-
-Projects showcased include:
-
-### ⭐ Star Sentinel
-Real-time wearable fear detection system using physiological signals and machine learning.
-
-### 🔐 Smart Privacy
-Encrypted health data platform with privacy-focused architecture.
-
-### 🧠 DeepSense
-AI-based application for suicidal text detection.
-
-### 🧭 SereneTrek LK
-Offline-first sustainable tourism mobile platform.
-
-### 🛰 Embiggen Viewer
-Satellite imagery exploration tool using NASA data.
-
-### 🌦 City Weather App
-React-based weather dashboard using OpenWeatherMap API.
-
----
-
-## ⚙️ Running the Project Locally
-
-Clone the repository:
-
-```bash
-git clone https://github.com/ThimashaThakshali/portfolio.git
+## 📂 Project Structure
