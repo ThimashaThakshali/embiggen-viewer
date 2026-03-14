@@ -78,7 +78,6 @@ These services allow developers to access global satellite imagery layers in rea
 
 ---
 
----
 
 ## 🚀 How to Run the Project
 
@@ -86,11 +85,14 @@ These services allow developers to access global satellite imagery layers in rea
 
 ```bash
 git clone https://github.com/ThimashaThakshali/embiggen-viewer.git'
+```
 
 ### 2️⃣ Navigate to the Folder
 
 ```bash
 cd embiggen-viewer
+
+```
 
 ### 3️⃣ Open the Application  
 
